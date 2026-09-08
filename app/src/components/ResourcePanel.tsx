@@ -1,8 +1,18 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Browser } from '@capacitor/browser'
+import { Capacitor } from '@capacitor/core'
 import type { ResourceItem, ResourceType, Series } from '../types'
 import { sortedResources, useAppStore, uid } from '../store/useAppStore'
 import { resourceTypeLabel } from '../lib/recommend'
 import { getLocalBlob, saveLocalBlob } from '../lib/idb'
+
+async function openExternalUrl(url: string) {
+  if (Capacitor.isNativePlatform()) {
+    await Browser.open({ url })
+    return
+  }
+  window.open(url, '_blank', 'noopener,noreferrer')
+}
 
 export function ResourcePanel({ series }: { series: Series }) {
   // 只订阅原始数组引用，排序放到 useMemo，避免 selector 每次返回新数组导致死循环白屏
@@ -33,7 +43,12 @@ export function ResourcePanel({ series }: { series: Series }) {
     if (res.type === 'web') {
       setPlayerSrc(null)
       setPlayerTip(`已打开 B站/网页入口：${res.title}`)
-      window.open(res.uri, '_blank', 'noopener,noreferrer')
+      try {
+        await openExternalUrl(res.uri)
+      } catch {
+        setPlayerTip('打开外链失败，请检查链接是否有效')
+        return
+      }
       setProgress(series.id, { status: 'doing', lastWatchedAt: new Date().toISOString() })
       return
     }
