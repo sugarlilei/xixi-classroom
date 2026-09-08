@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>嘻嘻小课堂 · 系列</title>
+  <link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+  <div class="page-bg">
+    <div class="phone">
+      <header class="topbar">
+        <h1>全部系列</h1>
+        <p class="sub">7 套核心启蒙内容，按龄筛选</p>
+      </header>
+      <main class="content">
+        <div class="chips" id="ageChips"></div>
+        <div class="section-title"><span id="countLabel">系列</span></div>
+        <div class="series-list" id="list"></div>
+      </main>
+      <div id="nav"></div>
+    </div>
+  </div>
+  <script src="js/data.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.getElementById("nav").innerHTML = ENL.renderShell("library").navHtml;
+    const chips = document.getElementById("ageChips");
+    function paint(ageId) {
+      chips.innerHTML = ENL.renderAgeChips(ageId);
+      const list = ENL.filteredSeries(ageId);
+      document.getElementById("countLabel").textContent = `共 ${list.length} 套`;
+      document.getElementById("list").innerHTML = list.map((s) => ENL.seriesCard(s)).join("") ||
+        '<div class="empty">没有匹配的系列</div>';
+    }
+    paint(ENL_STORE.getAgeFilter());
+    ENL.bindAgeChips(chips, paint);
+  </script>
+</body>
+</html>

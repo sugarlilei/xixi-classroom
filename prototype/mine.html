@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>嘻嘻小课堂 · 我的</title>
+  <link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+  <div class="page-bg">
+    <div class="phone">
+      <header class="topbar">
+        <h1>我的</h1>
+        <p class="sub">进度、收藏都存在本机</p>
+      </header>
+      <main class="content" id="root"></main>
+      <div id="nav"></div>
+    </div>
+  </div>
+  <script src="js/data.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.getElementById("nav").innerHTML = ENL.renderShell("mine").navHtml;
+    const all = ENL_DATA.series.map((s) => ({ s, p: ENL_STORE.getProgress(s.id) }));
+    const doing = all.filter((x) => x.p.status === "doing");
+    const done = all.filter((x) => x.p.status === "done");
+    const fav = all.filter((x) => x.p.favorite);
+
+    function block(title, items) {
+      return `<div class="section-title"><span>${title}</span><span style="color:var(--muted);font-weight:500">${items.length}</span></div>
+        <div class="series-list">${items.length ? items.map((x) => ENL.seriesCard(x.s)).join("") : '<div class="empty">暂无</div>'}</div>`;
+    }
+
+    document.getElementById("root").innerHTML =
+      block("进行中", doing) +
+      block("已完成", done) +
+      block("收藏", fav) +
+      `<div class="panel" style="margin-top:16px">
+        <h3>打卡（下版）</h3>
+        <p>v1.0 将支持按日期记录观看时长。当前版本请先用「进行中 / 已完成」标记。</p>
+      </div>
+      <div class="hint">数据保存在浏览器 localStorage，清除站点数据会丢失进度与个人资源配置。</div>`;
+  </script>
+</body>
+</html>

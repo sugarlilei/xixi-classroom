@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>嘻嘻小课堂 · 首页</title>
+  <link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+  <div class="page-bg">
+    <div class="phone">
+      <header class="topbar">
+        <h1 id="appTitle">嘻嘻小课堂</h1>
+        <p class="sub">今天播哪套？按年龄与路径给你建议</p>
+      </header>
+      <main class="content">
+        <div class="section-title"><span>孩子年龄</span><a href="guide.html">使用建议</a></div>
+        <div class="chips" id="ageChips"></div>
+
+        <div class="section-title"><span>今日推荐</span></div>
+        <div class="hero-list" id="recommend"></div>
+
+        <div class="section-title"><span>路径进度</span><a href="path.html">查看全部</a></div>
+        <div class="path-mini" id="pathMini"></div>
+
+        <div class="hint" style="margin-top:16px">
+          播放仅使用你自己准备的清晰资源（本地 / 直链 / B站收藏入口优先）。本工具不做片源分发。
+        </div>
+      </main>
+      <div id="nav"></div>
+    </div>
+  </div>
+  <script src="js/data.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    const shell = ENL.renderShell("home");
+    document.getElementById("appTitle").textContent = shell.appName;
+    document.getElementById("nav").innerHTML = shell.navHtml;
+
+    const chips = document.getElementById("ageChips");
+    function paint(ageId) {
+      chips.innerHTML = ENL.renderAgeChips(ageId);
+      const rec = ENL.recommend(ageId, 2);
+      const box = document.getElementById("recommend");
+      if (!rec.length) {
+        box.innerHTML = '<div class="empty">当前年龄暂无匹配系列，试试「全部」</div>';
+      } else {
+        box.innerHTML = rec.map((s) => {
+          const reason = `${ENL.stageName(s.stage)} · ${s.ageLabel} · ${s.summary}`;
+          return `
+            <a class="hero-card" href="detail.html?id=${s.id}" style="--accent:${s.accentColor}">
+              <div class="hero-cover">${s.nameZh.slice(0,1)}</div>
+              <div>
+                <h3>${s.nameZh} <span class="en">${s.nameEn}</span></h3>
+                <div class="series-meta">
+                  <span class="tag">${s.ageLabel}</span>
+                  <span class="tag tag-stage">${ENL.stageName(s.stage)}</span>
+                </div>
+                <p>${reason}</p>
+              </div>
+            </a>`;
+        }).join("");
+      }
+
+      const progress = ENL_STORE.getAllProgress();
+      const stages = ENL_DATA.stages.map((st) => {
+        const items = ENL_DATA.series.filter((s) => s.stage === st.id);
+        const done = items.filter((s) => (progress[s.id] || {}).status === "done").length;
+        return `<div class="cell ${done === items.length && items.length ? "done" : ""}">
+          <strong>${st.name}</strong>
+          <span>${done}/${items.length} 完成</span>
+        </div>`;
+      }).join("");
+      document.getElementById("pathMini").innerHTML = stages;
+    }
+
+    paint(ENL_STORE.getAgeFilter());
+    ENL.bindAgeChips(chips, paint);
+  </script>
+</body>
+</html>

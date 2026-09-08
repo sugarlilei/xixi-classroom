@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>嘻嘻小课堂 · 详情</title>
+  <link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+  <div class="page-bg">
+    <div class="phone">
+      <header class="topbar">
+        <h1><a href="library.html" style="font-weight:600;color:var(--primary-dark)">←</a> 系列详情</h1>
+        <p class="sub">特点 · 建议 · 个人资源播放</p>
+      </header>
+      <main class="content" id="root">
+        <div class="empty">加载中…</div>
+      </main>
+      <div id="nav"></div>
+    </div>
+  </div>
+  <script src="js/data.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.getElementById("nav").innerHTML = ENL.renderShell("library").navHtml;
+
+    const id = ENL.qs("id");
+    const series = ENL.getSeriesById(id);
+    const root = document.getElementById("root");
+
+    if (!series) {
+      root.innerHTML = '<div class="empty">未找到该系列。<a href="library.html">返回系列库</a></div>';
+    } else {
+      let objectUrls = [];
+      function revokeAll() {
+        objectUrls.forEach((u) => URL.revokeObjectURL(u));
+        objectUrls = [];
+      }
+
+      function currentResources() {
+        return ENL_STORE.getResources(series.id).slice().sort((a, b) => a.priority - b.priority);
+      }
+
+      function playResource(res) {
+        const box = document.getElementById("playerBox");
+        const tip = document.getElementById("playerTip");
+        if (!box) return;
+
+        if (res.type === "web") {
+          box.innerHTML = `<div class="player-empty">将打开 B站入口「${res.title}」<br/>（个人收藏/正版页外链，不内嵌不明源）</div>`;
+          tip.textContent = "已尝试打开 B站/网页入口";
+          window.open(res.uri, "_blank", "noopener,noreferrer");
+          ENL_STORE.setProgress(series.id, { status: "doing", lastWatchedAt: new Date().toISOString() });
+          return;
+        }
+
+        if (res.type === "folder") {
+          box.innerHTML = `<div class="player-empty">文件夹备忘：<br/><strong style="word-break:break-all">${escapeHtml(res.uri)}</strong><br/>请在资源管理器中打开该路径</div>`;
+          tip.textContent = "浏览器无法直接打开本地文件夹，已展示路径备忘";
+          return;
+        }
+
+        // local / direct → try in-page video
+        revokeAll();
+        const src = res.uri;
+        box.innerHTML = `<video id="player" controls playsinline preload="metadata"></video>`;
+        const video = document.getElementById("player");
+        tip.textContent = "正在加载你的清晰资源…";
+        video.src = src;
+        video.onloadeddata = () => {
+          tip.textContent = `正在播放：${res.title}（${ENL.resourceTypeLabel(res.type)}）`;
+          ENL_STORE.setProgress(series.id, { status: "doing", lastWatchedAt: new Date().toISOString() });
+        };
+        video.onerror = () => {
+          tip.textContent = "页内播放失败，可改用「打开」外链/检查直链是否可访问";
+          box.innerHTML = `<div class="player-empty">无法页内播放该资源。<br/>请确认本地文件仍可用，或直链支持浏览器直接拉流。<br/><button class="btn btn-ghost" id="openFallback">尝试打开 URI</button></div>`;
+          const btn = document.getElementById("openFallback");
+          if (btn) btn.onclick = () => window.open(src, "_blank", "noopener,noreferrer");
+        };
+      }
+
+      function escapeHtml(str) {
+        return String(str)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      function render() {
+        const p = ENL_STORE.getProgress(series.id);
+        const resources = currentResources();
+        const defaultRes = resources[0];
+
+        root.innerHTML = `
+          <section class="detail-hero" style="--accent:${series.accentColor};background:linear-gradient(135deg, ${series.accentColor}, #ffffff55)">
+            <h2>${series.nameZh}</h2>
+            <div class="en">${series.nameEn}</div>
+            <div class="tags">
+              <span>${series.ageLabel}</span>
+              <span>${ENL.stageName(series.stage)}</span>
+              ${series.goals.map((g) => `<span>${g}</span>`).join("")}
+            </div>
+          </section>
+
+          <section class="panel">
+            <h3>特点</h3>
+            <ul>${series.features.map((f) => `<li>${f}</li>`).join("")}</ul>
+          </section>
+
+          <section class="panel">
+            <h3>使用建议</h3>
+            <p>${series.tips}</p>
+          </section>
+
+          <section class="panel">
+            <h3>个人资源播放</h3>
+            <div class="hint" style="margin-top:0;margin-bottom:10px">
+              仅添加你自己已有的清晰资源。支持：本地视频、直链、<strong>B站收藏入口（默认偏好）</strong>、文件夹备忘。不提供片源。
+            </div>
+            <div class="player-box" id="playerBox">
+              <div class="player-empty">${defaultRes ? "选择下方资源开始播放" : "还没有资源，可先添加 B站收藏链接或本地视频"}</div>
+            </div>
+            <p class="meta" id="playerTip" style="margin:8px 0 0;font-size:12px;color:var(--muted)"></p>
+
+            <div class="resource-list" id="resourceList">
+              ${resources.length ? resources.map((r) => `
+                <div class="resource-item" data-rid="${r.id}">
+                  <div class="row">
+                    <div>
+                      <div class="title">${escapeHtml(r.title)}</div>
+                      <div class="meta">${ENL.resourceTypeLabel(r.type)} · 优先级 ${r.priority}${r.note ? " · " + escapeHtml(r.note) : ""}</div>
+                    </div>
+                  </div>
+                  <div class="ops">
+                    <button type="button" data-act="play">播放/打开</button>
+                    <button type="button" data-act="del">删除</button>
+                  </div>
+                </div>`).join("") : '<div class="empty">暂无个人资源</div>'}
+            </div>
+
+            <div class="form-grid" id="addForm">
+              <label>资源类型
+                <select id="resType">
+                  <option value="web" selected>B站入口（收藏/正版页外链，默认）</option>
+                  <option value="local">本地视频（页内播放）</option>
+                  <option value="direct">直链（网盘/NAS，页内或外开）</option>
+                  <option value="folder">文件夹备忘</option>
+                </select>
+              </label>
+              <label>标题
+                <input id="resTitle" placeholder="如：B站收藏夹 · SSS / 本地高清合集" />
+              </label>
+              <label id="uriLabel">地址 / 路径
+                <input id="resUri" placeholder="https://www.bilibili.com/… 或 路径备忘" />
+              </label>
+              <label id="fileLabel" style="display:none">选择本地视频
+                <input id="resFile" type="file" accept="video/*" />
+              </label>
+              <label>备注（可选）
+                <input id="resNote" placeholder="清晰度、集数范围等" />
+              </label>
+              <button type="button" class="btn btn-primary" id="addResBtn">添加资源</button>
+            </div>
+          </section>
+
+          <section class="panel">
+            <h3>学习状态</h3>
+            <p style="margin-bottom:10px">当前：<strong>${ENL.statusLabel(p.status)}</strong>${p.favorite ? " · 已收藏" : ""}</p>
+            <div class="actions">
+              <button class="btn btn-primary" id="btnDoing">标为进行中</button>
+              <button class="btn btn-ghost" id="btnDone">标为已完成</button>
+            </div>
+            <div class="actions" style="margin-top:8px">
+              <button class="btn btn-ghost" id="btnFav">${p.favorite ? "取消收藏" : "加入收藏"}</button>
+              <button class="btn btn-ghost" id="btnReset">重置为未开始</button>
+            </div>
+          </section>
+        `;
+
+        // type toggle
+        const typeEl = document.getElementById("resType");
+        const fileLabel = document.getElementById("fileLabel");
+        const uriLabel = document.getElementById("uriLabel");
+        function syncTypeUI() {
+          const t = typeEl.value;
+          const isLocal = t === "local";
+          fileLabel.style.display = isLocal ? "block" : "none";
+          uriLabel.style.display = isLocal ? "none" : "block";
+        }
+        typeEl.addEventListener("change", syncTypeUI);
+        syncTypeUI();
+
+        document.getElementById("addResBtn").onclick = () => {
+          const type = typeEl.value;
+          const title = document.getElementById("resTitle").value.trim() || ENL.resourceTypeLabel(type);
+          const note = document.getElementById("resNote").value.trim();
+          let uri = document.getElementById("resUri").value.trim();
+
+          if (type === "local") {
+            const file = document.getElementById("resFile").files[0];
+            if (!file) { alert("请选择本地视频文件"); return; }
+            uri = URL.createObjectURL(file);
+            objectUrls.push(uri);
+          } else if (!uri) {
+            alert("请填写地址或路径");
+            return;
+          }
+
+          const list = currentResources();
+          ENL_STORE.addResource(series.id, {
+            id: ENL_STORE.uid("res"),
+            seriesId: series.id,
+            type,
+            title,
+            uri,
+            note,
+            priority: list.length + 1,
+            createdAt: new Date().toISOString(),
+            // 原型提示：objectURL 刷新后会失效，正式版可用桌面端记路径
+            ephemeral: type === "local"
+          });
+          render();
+        };
+
+        document.getElementById("resourceList").addEventListener("click", (e) => {
+          const btn = e.target.closest("button[data-act]");
+          if (!btn) return;
+          const item = btn.closest("[data-rid]");
+          const rid = item.getAttribute("data-rid");
+          const res = currentResources().find((r) => r.id === rid);
+          if (!res) return;
+          if (btn.getAttribute("data-act") === "play") playResource(res);
+          if (btn.getAttribute("data-act") === "del") {
+            ENL_STORE.removeResource(series.id, rid);
+            render();
+          }
+        });
+
+        document.getElementById("btnDoing").onclick = () => {
+          ENL_STORE.setProgress(series.id, { status: "doing", lastWatchedAt: new Date().toISOString() });
+          render();
+        };
+        document.getElementById("btnDone").onclick = () => {
+          ENL_STORE.setProgress(series.id, { status: "done", lastWatchedAt: new Date().toISOString() });
+          render();
+        };
+        document.getElementById("btnFav").onclick = () => {
+          const cur = ENL_STORE.getProgress(series.id);
+          ENL_STORE.setProgress(series.id, { favorite: !cur.favorite });
+          render();
+        };
+        document.getElementById("btnReset").onclick = () => {
+          ENL_STORE.setProgress(series.id, { status: "todo" });
+          render();
+        };
+
+        if (defaultRes && (defaultRes.type === "local" || defaultRes.type === "direct")) {
+          // 不自动播放，避免打扰；仅提示
+          document.getElementById("playerTip").textContent = `已就绪：${defaultRes.title}（点击「播放/打开」）`;
+        }
+      }
+
+      render();
+    }
+  </script>
+</body>
+</html>

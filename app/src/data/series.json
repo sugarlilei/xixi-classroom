@@ -1,0 +1,178 @@
+{
+  "appName": "嘻嘻小课堂",
+  "preferredWebPlatform": "bilibili",
+  "preferredWebPlatformLabel": "B站",
+  "stages": [
+    {
+      "id": "listen",
+      "name": "入门泛听",
+      "desc": "听觉与视觉泛听，建立节奏与单词敏感"
+    },
+    {
+      "id": "scene",
+      "name": "情景输入",
+      "desc": "贴近日常生活的情境表达与兴趣沉浸"
+    },
+    {
+      "id": "advance",
+      "name": "进阶",
+      "desc": "有一定听力基础后的句型与科普拓展"
+    }
+  ],
+  "ageFilters": [
+    { "id": "all", "label": "全部" },
+    { "id": "0-1.5", "label": "0-1.5岁", "min": 0, "max": 1.5 },
+    { "id": "1.5-3", "label": "1.5-3岁", "min": 1.5, "max": 3 },
+    { "id": "2-4", "label": "2-4岁", "min": 2, "max": 4 },
+    { "id": "3+", "label": "3岁+", "min": 3, "max": 99 },
+    { "id": "4+", "label": "4岁+", "min": 4, "max": 99 }
+  ],
+  "series": [
+    {
+      "id": "sss",
+      "nameZh": "Sss儿歌",
+      "nameEn": "Super Simple Songs",
+      "ageMin": 0,
+      "ageMax": 3,
+      "ageLabel": "0-3岁",
+      "stage": "listen",
+      "orderInStage": 1,
+      "goals": ["听力输入", "律动"],
+      "features": [
+        "节奏欢快",
+        "发音极其清晰",
+        "语速慢且重复性高",
+        "配有简单肢体动作"
+      ],
+      "tips": "听力及律动输入首选，适合作为启蒙第一站反复听唱。",
+      "summary": "听力及律动输入首选",
+      "accentColor": "#F6C945"
+    },
+    {
+      "id": "yakka",
+      "nameZh": "Yakka Dee",
+      "nameEn": "Yakka Dee",
+      "ageMin": 1.5,
+      "ageMax": 3,
+      "ageLabel": "1.5-3岁",
+      "stage": "listen",
+      "orderInStage": 2,
+      "goals": ["开口说单词", "词汇积累"],
+      "features": [
+        "BBC 真人+动画结合",
+        "每集专注于一个核心单词",
+        "大量真实场景",
+        "不同小朋友重现强化记忆"
+      ],
+      "tips": "适合开口说单词与词汇积累，和 SSS 一起做听觉视觉泛听。",
+      "summary": "开口说单词与词汇积累",
+      "accentColor": "#7EC8E3"
+    },
+    {
+      "id": "maisy",
+      "nameZh": "小鼠波波",
+      "nameEn": "Maisy Mouse",
+      "ageMin": 1.5,
+      "ageMax": 3,
+      "ageLabel": "1.5-3岁",
+      "stage": "scene",
+      "orderInStage": 1,
+      "goals": ["日常生活场景表达"],
+      "features": [
+        "画风色彩鲜艳、线条简单",
+        "内容贴近幼儿日常生活（如刷牙、睡觉、游玩）",
+        "语言非常浅显"
+      ],
+      "tips": "适合日常生活场景表达，作为情景输入的起点。",
+      "summary": "日常生活场景表达",
+      "accentColor": "#F4A6C8"
+    },
+    {
+      "id": "penelope",
+      "nameZh": "蓝色小考拉",
+      "nameEn": "Penelope",
+      "ageMin": 2,
+      "ageMax": 4,
+      "ageLabel": "2-4岁",
+      "stage": "scene",
+      "orderInStage": 2,
+      "goals": ["日常习惯", "情商培养"],
+      "features": [
+        "法语引进经典动画（英文版）",
+        "每集约 5 分钟",
+        "语气温柔自然",
+        "贴近家庭日常教养"
+      ],
+      "tips": "适合日常习惯与情商培养，短集更易坚持。",
+      "summary": "日常习惯与情商培养",
+      "accentColor": "#8FB8FF"
+    },
+    {
+      "id": "wow",
+      "nameZh": "Wow English",
+      "nameEn": "Wow English",
+      "ageMin": 2,
+      "ageMax": 4,
+      "ageLabel": "2-4岁",
+      "stage": "scene",
+      "orderInStage": 3,
+      "goals": ["兴趣", "沉浸感"],
+      "features": [
+        "真人与夸张动画角色（Steve & Maggie）互动",
+        "表情动作丰富",
+        "情境感极强，抓人眼球"
+      ],
+      "tips": "培养对英语兴趣与沉浸感，可与情景输入系列并行。",
+      "summary": "培养英语兴趣与沉浸感",
+      "accentColor": "#FF8B6A"
+    },
+    {
+      "id": "muzzy",
+      "nameZh": "Big Muzzy",
+      "nameEn": "Big Muzzy",
+      "ageMin": 3,
+      "ageMax": 99,
+      "ageLabel": "3岁以上",
+      "stage": "advance",
+      "orderInStage": 1,
+      "goals": ["句型结构", "故事听力"],
+      "features": [
+        "BBC 出品经典启蒙动画",
+        "句型结构设计科学",
+        "重点词汇不断高频重复",
+        "故事性强"
+      ],
+      "tips": "适合有一定听力基础后的进阶，重点跟句型与重复输入。",
+      "summary": "句型科学、故事进阶",
+      "accentColor": "#9ACD7A"
+    },
+    {
+      "id": "wildkratts",
+      "nameZh": "动物冒险王国",
+      "nameEn": "Wild Kratts",
+      "ageMin": 4,
+      "ageMax": 99,
+      "ageLabel": "4岁以上",
+      "stage": "advance",
+      "orderInStage": 2,
+      "goals": ["自然科学", "听力拓展"],
+      "features": [
+        "科普冒险类动画",
+        "介绍各类野生动物及自然知识",
+        "语速稍快，词汇量更大"
+      ],
+      "tips": "适合英语听力基础较好、对自然科学感兴趣的孩子。",
+      "summary": "科普冒险与词汇拓展",
+      "accentColor": "#5BBF8A"
+    }
+  ],
+  "pathGuide": {
+    "title": "使用建议 · 顺序规划",
+    "steps": [
+      "从 Sss儿歌 和 Yakka Dee 开始做听觉和视觉泛听",
+      "逐步过渡到 小鼠波波 与 蓝色小考拉 的情景输入（可并行 Wow English 提兴趣）",
+      "最后进阶到 Big Muzzy 或 动物冒险王国"
+    ],
+    "note": "播放请使用你自己已准备好的清晰资源（本地文件 / 网盘直链 / B站收藏入口优先）。本工具只做导航与进度，不提供片源。"
+  }
+}

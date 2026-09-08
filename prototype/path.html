@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>嘻嘻小课堂 · 路径</title>
+  <link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+  <div class="page-bg">
+    <div class="phone">
+      <header class="topbar">
+        <h1>启蒙路径</h1>
+        <p class="sub">入门泛听 → 情景输入 → 进阶，避免乱跳</p>
+      </header>
+      <main class="content" id="pathRoot"></main>
+      <div id="nav"></div>
+    </div>
+  </div>
+  <script src="js/data.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.getElementById("nav").innerHTML = ENL.renderShell("path").navHtml;
+    const root = document.getElementById("pathRoot");
+    root.innerHTML = ENL_DATA.stages.map((st, idx) => {
+      const items = ENL_DATA.series
+        .filter((s) => s.stage === st.id)
+        .sort((a, b) => a.orderInStage - b.orderInStage);
+      const list = items.map((s) => {
+        const p = ENL_STORE.getProgress(s.id);
+        return `<a class="mini-item" href="detail.html?id=${s.id}">
+          <span>${s.nameZh} · ${s.ageLabel}</span>
+          <span class="tag tag-status">${ENL.statusLabel(p.status)}</span>
+        </a>`;
+      }).join("");
+      return `<section class="path-stage">
+        <h3>${idx + 1}. ${st.name}</h3>
+        <p class="desc">${st.desc}</p>
+        <div class="mini-list">${list}</div>
+      </section>`;
+    }).join("") + `
+      <div class="panel">
+        <h3>顺序提醒</h3>
+        <ol style="margin:0;padding-left:18px;font-size:13px;line-height:1.6;color:var(--muted)">
+          ${ENL_DATA.pathGuide.steps.map((s) => `<li>${s}</li>`).join("")}
+        </ol>
+        <p style="margin-top:10px">${ENL_DATA.pathGuide.note}</p>
+      </div>`;
+  </script>
+</body>
+</html>
