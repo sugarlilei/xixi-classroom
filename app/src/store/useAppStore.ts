@@ -8,14 +8,12 @@ interface AppState {
   progress: Record<string, Progress>
   resources: Record<string, ResourceItem[]>
   setAgeFilter: (id: string) => void
-  getProgress: (seriesId: string) => Progress
   setProgress: (seriesId: string, patch: Partial<Progress>) => void
-  getResources: (seriesId: string) => ResourceItem[]
   addResource: (seriesId: string, item: ResourceItem) => void
   removeResource: (seriesId: string, resourceId: string) => Promise<void>
 }
 
-function emptyProgress(seriesId: string): Progress {
+export function emptyProgress(seriesId: string): Progress {
   return {
     seriesId,
     status: 'todo',
@@ -23,6 +21,19 @@ function emptyProgress(seriesId: string): Progress {
     lastWatchedAt: null,
     note: '',
   }
+}
+
+/** 从 progress map 取状态；勿在 zustand selector 里每次 new 对象 */
+export function resolveProgress(
+  progressMap: Record<string, Progress>,
+  seriesId: string,
+): Progress {
+  return progressMap[seriesId] ?? emptyProgress(seriesId)
+}
+
+/** 排序资源列表；在组件 useMemo 中调用，避免 selector 每次新引用 */
+export function sortedResources(list: ResourceItem[] | undefined): ResourceItem[] {
+  return (list || []).slice().sort((a, b) => a.priority - b.priority)
 }
 
 export const useAppStore = create<AppState>()(
@@ -33,8 +44,6 @@ export const useAppStore = create<AppState>()(
       resources: {},
 
       setAgeFilter: (id) => set({ ageFilterId: id }),
-
-      getProgress: (seriesId) => get().progress[seriesId] || emptyProgress(seriesId),
 
       setProgress: (seriesId, patch) =>
         set((state) => ({
@@ -48,9 +57,6 @@ export const useAppStore = create<AppState>()(
             },
           },
         })),
-
-      getResources: (seriesId) =>
-        (get().resources[seriesId] || []).slice().sort((a, b) => a.priority - b.priority),
 
       addResource: (seriesId, item) =>
         set((state) => {

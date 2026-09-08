@@ -1,11 +1,12 @@
 import { Link } from 'react-router-dom'
 import type { Series } from '../types'
-import { useAppStore } from '../store/useAppStore'
+import { resolveProgress, useAppStore } from '../store/useAppStore'
 import { statusLabel } from '../lib/recommend'
 import catalog from '../data/series.json'
 
 export function SeriesCard({ series }: { series: Series }) {
-  const progress = useAppStore((s) => s.getProgress(series.id))
+  const progressMap = useAppStore((s) => s.progress)
+  const progress = resolveProgress(progressMap, series.id)
   const stageName = catalog.stages.find((st) => st.id === series.stage)?.name || series.stage
 
   return (

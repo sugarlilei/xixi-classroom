@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { ResourceItem, ResourceType, Series } from '../types'
-import { useAppStore, uid } from '../store/useAppStore'
+import { sortedResources, useAppStore, uid } from '../store/useAppStore'
 import { resourceTypeLabel } from '../lib/recommend'
 import { getLocalBlob, saveLocalBlob } from '../lib/idb'
 
 export function ResourcePanel({ series }: { series: Series }) {
-  const resources = useAppStore((s) => s.getResources(series.id))
+  // 只订阅原始数组引用，排序放到 useMemo，避免 selector 每次返回新数组导致死循环白屏
+  const rawResources = useAppStore((s) => s.resources[series.id])
   const addResource = useAppStore((s) => s.addResource)
   const removeResource = useAppStore((s) => s.removeResource)
   const setProgress = useAppStore((s) => s.setProgress)
@@ -19,10 +20,7 @@ export function ResourcePanel({ series }: { series: Series }) {
   const [playerTip, setPlayerTip] = useState('')
   const [playingId, setPlayingId] = useState<string | null>(null)
 
-  const sorted = useMemo(
-    () => resources.slice().sort((a, b) => a.priority - b.priority),
-    [resources],
-  )
+  const sorted = useMemo(() => sortedResources(rawResources), [rawResources])
 
   useEffect(() => {
     return () => {

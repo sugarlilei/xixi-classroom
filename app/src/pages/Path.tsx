@@ -1,14 +1,14 @@
 import { Link } from 'react-router-dom'
 import catalog from '../data/series.json'
 import { PageShell } from '../components/Layout'
-import { useAppStore } from '../store/useAppStore'
+import { resolveProgress, useAppStore } from '../store/useAppStore'
 import { statusLabel } from '../lib/recommend'
 import type { Catalog } from '../types'
 
 const data = catalog as Catalog
 
 export function Path() {
-  const getProgress = useAppStore((s) => s.getProgress)
+  const progressMap = useAppStore((s) => s.progress)
 
   return (
     <PageShell title="启蒙路径" subtitle="入门泛听 → 情景输入 → 进阶，避免乱跳">
@@ -27,7 +27,7 @@ export function Path() {
             <p className="mt-1 mb-2.5 text-xs text-[#7a7168]">{st.desc}</p>
             <div className="grid gap-2">
               {items.map((s) => {
-                const p = getProgress(s.id)
+                const p = resolveProgress(progressMap, s.id)
                 return (
                   <Link
                     key={s.id}

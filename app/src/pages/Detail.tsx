@@ -2,7 +2,7 @@ import { Link, useParams } from 'react-router-dom'
 import catalog from '../data/series.json'
 import { PageShell } from '../components/Layout'
 import { ResourcePanel } from '../components/ResourcePanel'
-import { useAppStore } from '../store/useAppStore'
+import { resolveProgress, useAppStore } from '../store/useAppStore'
 import { statusLabel } from '../lib/recommend'
 import type { Catalog, ProgressStatus, Series } from '../types'
 
@@ -11,15 +11,16 @@ const data = catalog as Catalog
 export function Detail() {
   const { id } = useParams()
   const series = (data.series as Series[]).find((s) => s.id === id)
-  const progress = useAppStore((s) => (series ? s.getProgress(series.id) : null))
+  const progressMap = useAppStore((s) => s.progress)
   const setProgress = useAppStore((s) => s.setProgress)
+  const progress = series ? resolveProgress(progressMap, series.id) : null
 
   if (!series || !progress) {
     return (
       <PageShell title="系列详情" subtitle="未找到">
         <div className="py-8 text-center text-[13px] text-[#7a7168]">
-          未找到该系列。
-          <Link to="/library" className="text-[#2a9a7f]">
+          未找到该系列（id: {id || '空'}）。
+          <Link to="/library" className="ml-1 text-[#2a9a7f]">
             返回系列库
           </Link>
         </div>
