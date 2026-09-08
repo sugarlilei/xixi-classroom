@@ -8,11 +8,12 @@
 kids-english-enlighten/
 ├── README.md
 ├── docs/product/             # 产品文档
-├── docs/tech/                # 技术草案
+├── docs/tech/                # 技术草案 + Git 约定
 ├── data/series.json          # 内容种子
 ├── prototype/                # v0.1 HTML 原型
-├── app/                      # v0.2 正式版（Vite React PWA）← 日常使用这个
-└── assets/
+├── app/                      # v0.2 正式版（Vite React PWA + Capacitor）
+├── assets/                   # 封面等预留
+└── release/                  # 可安装产物（APK / Web zip / 说明）
 ```
 
 ## 安装包（release）
@@ -20,8 +21,10 @@ kids-english-enlighten/
 | 平台 | 状态 | 路径 |
 |------|------|------|
 | **安卓 APK** | ✅ 可直接安装 | `release/android/xixi-classroom-debug.apk` |
-| **iOS IPA** | ⚠️ 需 Mac 签名 | 工程已生成在 `app/ios/`，说明见 `release/INSTALL.md` |
+| **iOS IPA** | ⚠️ 需 Mac 签名 | 工程在 `app/ios/`，说明见 `release/INSTALL.md` |
 | Web/PWA | ✅ | `release/xixi-classroom-web-v0.2.zip` |
+
+Git 约定见 [docs/tech/GIT.md](docs/tech/GIT.md)。
 
 ## 启动正式版（开发）
 

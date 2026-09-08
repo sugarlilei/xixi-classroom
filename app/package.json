@@ -8,10 +8,12 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
+    "smoke": "node scripts/smoke-check.mjs",
     "build:web": "tsc -b && vite build",
     "cap:sync": "npm run build:web && npx cap sync",
     "android:apk": "npm run cap:sync && cd android && .\\gradlew.bat assembleDebug",
-    "android:open": "npx cap open android"
+    "android:open": "npx cap open android",
+    "release:web": "npm run build:web && node scripts/pack-web-release.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.1",

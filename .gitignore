@@ -2,13 +2,23 @@
 node_modules/
 **/node_modules/
 
-# Build outputs
+# Build outputs (app 内构建产物不入库；发布包见 release/)
 dist/
 **/dist/
 dist-ssr/
 *.local
+app/dist/
 
-# Capacitor / Android build
+# Release 中间产物：web-dist 由 app/dist 复制而来，只保留 zip
+release/web-dist/
+
+# E2E / 测试产物
+app/e2e-artifacts/
+playwright-report/
+test-results/
+**/__screenshots__/
+
+# Capacitor / Android 本地构建与同步产物
 app/android/.gradle/
 app/android/app/build/
 app/android/build/
@@ -16,12 +26,16 @@ app/android/captures/
 app/android/local.properties
 app/android/*.iml
 app/android/.idea/
+app/android/app/src/main/assets/
+app/android/capacitor-cordova-android-plugins/
 **/.cxx/
 
-# iOS (local pods / derived)
+# iOS 本地产物
 app/ios/App/Pods/
 app/ios/DerivedData/
 app/ios/**/xcuserdata/
+app/ios/App/App/public/
+app/ios/capacitor-cordova-ios-plugins/
 *.xcworkspace/xcuserdata/
 
 # Logs & env
@@ -44,9 +58,10 @@ Thumbs.db
 *.sln
 *.sw?
 
-# Gradle cache noise
+# Gradle / APK 中间文件（正式发布 APK 保留在 release/android/）
 *.apk.idsig
 *.ap_
 *.dex
 
-# Keep release APK, ignore other apk under android build only (already covered by app/build)
+# ��ͣ�е� Playwright �߲�ű�����ѡ������⣩
+app/scripts/e2e-flow.mjs
