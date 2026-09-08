@@ -3,9 +3,10 @@ import type { AgeFilter, Progress, Series, StageId } from '../types'
 const STAGE_ORDER: StageId[] = ['listen', 'scene', 'advance']
 
 export function matchAge(series: Series, filter: AgeFilter): boolean {
-  if (!filter.min && filter.min !== 0) return true
-  if (filter.max == null) return true
-  return series.ageMin <= filter.max && series.ageMax >= (filter.min ?? 0)
+  // 「全部」等无区间过滤器直接放行
+  if (filter.min == null || filter.max == null) return true
+  // 区间有重叠即匹配（如 0-3 与 1.5-3）
+  return series.ageMin <= filter.max && series.ageMax >= filter.min
 }
 
 export function filteredSeries(
